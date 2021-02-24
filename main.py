@@ -299,11 +299,7 @@ if __name__ == "__main__":
         if contentType == PODCAST_CONTENT_TYPE:
             listOfAudioSegments = os.listdir(outputFolderAbsolutePath)
             listOfSpecificSpeakerAudioSegments = [x for x in listOfAudioSegments if audioFileName in x]
-            print("LIST OF SPEAKER AUDIO: ")
-            print(*listOfSpecificSpeakerAudioSegments, sep='\n')
             sortedListOfSpecificSpeakerAudioSegments = sorted(listOfSpecificSpeakerAudioSegments)
-            print("SORTED LIST OF SPEAKER AUDIO: ")
-            print(*sortedListOfSpecificSpeakerAudioSegments, sep='\n')
             firstAudioSegment = sortedListOfSpecificSpeakerAudioSegments[0]
             sortedListOfSpecificSpeakerAudioSegments.remove(firstAudioSegment)
             combinedAudio = AudioSegment.from_wav(os.path.join(outputFolderAbsolutePath, firstAudioSegment))
@@ -326,18 +322,20 @@ if __name__ == "__main__":
     if contentType == PODCAST_CONTENT_TYPE:
         exportedFileName = os.path.join(outputFolderAbsolutePath, "COMBINED.wav")
         print("exporting combined audio into single audio file in location " + exportedFileName + "...")
-        specificTrackFiles = os.listdir(outputFolderAbsolutePath)
-        firstAudioSegment = specificTrackFiles[0]
-        specificTrackFiles.remove(firstAudioSegment)
+        listOfSpeakerAudios = os.listdir(outputFolderAbsolutePath)
+        firstAudioSegment = listOfSpeakerAudios[0]
+        listOfSpeakerAudios.remove(firstAudioSegment)
         combinedAudio = AudioSegment.from_wav(os.path.join(outputFolderAbsolutePath, firstAudioSegment))
-        for speakerAudioFileName in specificTrackFiles:
-            trackFileAbsolutePath = os.path.join(outputFolderAbsolutePath, speakerAudioFileName)
-            print(trackFileAbsolutePath)
-            audio = AudioSegment.from_wav(trackFileAbsolutePath)
+        for speakerAudioFileName in listOfSpeakerAudios:
+            speakerFileAbsolutePath = os.path.join(outputFolderAbsolutePath, speakerAudioFileName)
+            print(speakerFileAbsolutePath)
+            audio = AudioSegment.from_wav(speakerFileAbsolutePath)
             combinedAudio = combinedAudio.overlay(audio)
         combinedAudio.export(exportedFileName, format="wav")
         print("successfully exported combined audio at " + exportedFileName + "!!")
     elif contentType == MUSIC_CONTENT_TYPE:
+        singlesFolderAbsolutePath = os.path.join(outputFolderAbsolutePath, "singles")
+        os.mkdir(singlesFolderAbsolutePath)
         specificTrackFolders = os.listdir(outputFolderAbsolutePath)
         for specificTrackFolder in specificTrackFolders:
             specificTrackFolderAbsolutePath = os.path.join(outputFolderAbsolutePath, specificTrackFolder)
@@ -354,4 +352,5 @@ if __name__ == "__main__":
                     audio = AudioSegment.from_wav(trackFileAbsolutePath)
                     combinedAudio = combinedAudio.overlay(audio)
                 combinedAudio.export(exportedFileName, format="wav")
+                combinedAudio.export(os.path.join(singlesFolderAbsolutePath, specificTrackFolder + "_COMBINED.wav"), format="wav")
                 print("successfully exported combined audio at " + exportedFileName + "!!")
